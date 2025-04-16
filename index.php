@@ -58,8 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
       }
     } else {
-          header('Location: http://localhost:200/index.php?failure=1');
-          exit;
+      header('Location: http://localhost:200/index.php?failure=1');
+      exit;
     }
   }
 }
@@ -183,8 +183,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <textarea class="form-control" id="comments" name="comment" placeholder="Leave a comment here..."></textarea>
           </div>
 
-          <div class="d-grid">
-            <button type="submit" class="btn btn-primary btn-lg rounded-pill" name="save">Submit</button>
+          <div class="d-flex justify-content-center gap-3">
+            <button type="submit" class="btn btn-primary px-5" name="save">Submit</button>
+            <a href="/index_records.php" class="btn btn-info px-5">View Records</a>
           </div>
         </form>
       </div>

@@ -1,3 +1,35 @@
+<?php
+
+require_once "includes/db_connect.php";
+
+$conn = connectDB();
+
+//Read from the database
+
+$sql = "SELECT * FROM records";
+
+$results = mysqli_query($conn, $sql);
+
+if ($results === false) {
+    echo mysqli_error($conn);
+} else {
+    $all_data = mysqli_fetch_all($results, MYSQLI_ASSOC);
+}
+
+//Clearing all records at once from the database
+if (isset($_POST['clear_records'])) {
+
+    $sql = "TRUNCATE TABLE records";
+    mysqli_query($conn, $sql);
+
+    header("Location: http://localhost:200/index_records.php");
+    exit();
+}
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,59 +65,68 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <?php if (!empty($all_data)): ?>
+                            <tbody>
 
-                            <!-- Example Data Row -->
-                            <tr>
-                                <td>1</td>
-                                <td>Okwuazi MaryJane</td>
-                                <td>maryjane23</td>
-                                <td>Science</td>
-                                <td>Microbiology</td>
-                                <td>2024-09-10</td>
-                                <td>Diploma</td>
-                                <td>
-                                    <!-- Button trigger modal -->
-                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                        Comments
-                                    </button>
+                                <!-- Example Data Row -->
+                                <?php foreach ($all_data as $index => $data): ?>
+                                    <tr>
+                                        <td><?= $data['id'] ?></td>
+                                        <td><?= $data['full_name'] ?></td>
+                                        <td><?= $data['username'] ?></td>
+                                        <td><?= $data['faculty'] ?></td>
+                                        <td><?= $data['department'] ?></td>
+                                        <td><?= $data['admission_date'] ?></td>
+                                        <td><?= $data['admission_type'] ?></td>
+                                        <td>
+                                            <!-- Button trigger modal -->
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal<?= $data['id'] ?>">
+                                                Comments
+                                            </button>
 
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Student Comment</h1>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    ...
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="exampleModal<?= $data['id'] ?>" aria-labelledby="exampleModalLabel<?= $data['id'] ?>" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Student Comment</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <?= $data['comment'] ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="#" class="btn btn-sm btn-secondary">Show</a>
-                                        <a href="#" class="btn btn-sm btn-warning">Update</a>
-                                        <a href="#" class="btn btn-sm btn-danger">Delete</a>
-                                    </div>
-                                </td>
-                            </tr>
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-sm btn-secondary" href="show.php?id=<?= $data['id'] ?>">Show</a>
+                                            <a class="btn btn-sm btn-warning me-1" href="edit.php?id=<?=$data['id'] ?>">Update</a>
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
 
-                            <!-- Additional rows will go here from the database -->
+                                <!-- Additional rows will go here from the database -->
 
-                        </tbody>
+                            </tbody>
+                        <?php else: ?>
+                            <p>No student records found.</p>
+                        <?php endif; ?>
                     </table>
                 </div>
-            </div class="text-center mt-4">
-            <a href="create.html" class="btn btn-success px-4">Add New Student</a>
-        </div>
-    </div>
-    </div>
+                <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                    <a href="/index.php" class="btn btn-success px-4">Add New Student</a>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+                    <form method="POST">
+                        <button type="submit" name="clear_records" class="btn btn-dark px-4">Clear Records</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

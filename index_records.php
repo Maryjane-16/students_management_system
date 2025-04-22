@@ -79,10 +79,14 @@ if (isset($_POST['clear_records'])) {
                                         <td><?= $data['admission_date'] ?></td>
                                         <td><?= $data['admission_type'] ?></td>
                                         <td>
+                                            <?php if(!empty($data['comment'])): ?>
                                             <!-- Button trigger modal -->
                                             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal<?= $data['id'] ?>">
-                                                Comments
+                                                view
                                             </button>
+                                            <?php else: ?>
+                                                <button type="button" class="btn btn-sm btn-primary" disabled>view</button>
+                                            <?php endif; ?>
 
                                             <!-- Modal -->
                                             <div class="modal fade" id="exampleModal<?= $data['id'] ?>" aria-labelledby="exampleModalLabel<?= $data['id'] ?>" aria-hidden="true">
@@ -96,13 +100,13 @@ if (isset($_POST['clear_records'])) {
                                                             <?= $data['comment'] ?>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div>q
                                             </div>
                                         </td>
                                         <td>
                                             <a class="btn btn-sm btn-secondary" href="show.php?id=<?= $data['id'] ?>">Show</a>
                                             <a class="btn btn-sm btn-warning me-1" href="edit.php?id=<?=$data['id'] ?>">Update</a>
-                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            <a class="btn btn-sm btn-danger" href="delete.php?id=<?= $data['id'] ?>">Delete</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

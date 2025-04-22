@@ -1,35 +1,23 @@
 <?php
 
 require_once "includes/DB_connect.php";
+require_once "includes/get_record_id.php";
+
+session_start();
 
 
 /**
  * Reading out a specific data from the database
  */
 
-
- $id = $_GET['id'];
+$id = $_GET['id'];
 
 //connect our db
 $conn = connectDB();
 
-// fetches a specific record by its id
-$sql = "SELECT * FROM records WHERE id = ?";
+$data = getRecordById($conn, $id);
 
-//prepare an SQL statement for execution
-$stmt = mysqli_prepare($conn, $sql);
 
-//bind variables for the parameter markers in the SQL statement prepared
-mysqli_stmt_bind_param($stmt, 'i', $id);
-
-//execute the prepared statement
-$results = mysqli_stmt_execute($stmt);
-
-//get a result set from a prepared statement as an object
-$get_result = mysqli_stmt_get_result($stmt);
-
-//mysqli_fetch_array(get_result, MYSQLI_ASSOC);
-$data = mysqli_fetch_assoc($get_result);
 //print_r($data);
 
 
@@ -59,6 +47,16 @@ $data = mysqli_fetch_assoc($get_result);
       </div>
 
       <div class="card-body">
+
+      <!--show success message-->
+      <?php if (isset($_SESSION['success_message'])): ?>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= $_SESSION['success_message']; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          <?php unset($_SESSION['success_message']); ?>
+        <?php endif; ?>
+
         <!-- Student Info Section -->
         <div class="row mb-3">
           <div class="col-md-6">
@@ -70,14 +68,14 @@ $data = mysqli_fetch_assoc($get_result);
           <div class="col-md-6">
             <p><strong>Admission Date:</strong> <?= $data['admission_date'] ?></p>
             <p><strong>Admission Type:</strong> <?= $data['admission_type'] ?></p>
-            <p><strong>Comments:</strong> <?= $data['comment'] ?></p/p>
+            <p><strong>Comments:</strong> <?= $data['comment'] ?></p>
           </div>
         </div>
 
         <!-- Action Buttons -->
         <div class="d-flex justify-content-between mt-4">
           <a href="index_records.php" class="btn btn-secondary px-4">Back</a>
-          <a href="delete.php?id=1" class="btn btn-danger px-4" onclick="return confirm('Are you sure you want to delete this record?')">Delete</a>
+          <a class="btn btn-danger px-4" href="delete.php?id=<?= $id ?>">Delete</a>
         </div>
       </div>
     </div>

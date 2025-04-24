@@ -2,6 +2,8 @@
 
 require_once "includes/DB_connect.php";
 
+session_start();
+
 $id = $_GET['id'];
 
 //connect our db

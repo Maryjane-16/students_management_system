@@ -1,6 +1,9 @@
 <?php
 
+session_start();
+
 require_once "includes/db_connect.php";
+require_once "includes/auth.php";
 
 //initiate an error handler function
 function myErrorHandler($errno, $errstr)
@@ -106,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form method="POST">
 
-          <!--Full Name and Username -->
+        <!--Full Name and Username -->
 
           <div class="row g-3 mb-3">
             <div class="col-md-6">
@@ -185,9 +188,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <div class="d-flex justify-content-center gap-3">
             <button type="submit" class="btn btn-primary px-5" name="save">Submit</button>
+
+            <?php if(isLoggedIn()): ?>
             <a href="/index_records.php" class="btn btn-info px-5">View Records</a>
+            <?php endif; ?>
+
           </div>
+
         </form>
+
+
+        <div class="py-3 text-center">
+
+        <?php if (isLoggedIn()): ?>
+          <p>You are logged in. <a href="logout.php">Logout</a>?</p>
+          <?php else: ?>
+            <p>Are you an admin? If yes, <a href="login.php">Login<a>!</p>
+          <?php endif; ?>
+            
+        
       </div>
     </div>
   </div>

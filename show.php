@@ -1,10 +1,10 @@
 <?php
 
-require_once "includes/DB_connect.php";
-require_once "includes/get_record_id.php";
-
 session_start();
 
+require_once "includes/DB_connect.php";
+require_once "includes/get_record_id.php";
+require_once "includes/isloggedin.php";
 
 /**
  * Reading out a specific data from the database

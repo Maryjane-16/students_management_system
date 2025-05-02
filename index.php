@@ -19,6 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if (isset($_POST['save'])) {
 
+    require_once "includes/file_upload.php";
+
     $full_name = trim(htmlspecialchars($_POST['full_name']));
     $username = trim(htmlspecialchars($_POST['username']));
     $faculty = trim(htmlspecialchars($_POST['faculty']));
@@ -37,8 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $conn = connectDB();
 
       //insert the data into a database
-      $sql = "INSERT INTO records (full_name, username, faculty, department, admission_date, admission_type, comment)
-      VALUES (?, ?, ?, ?, ?, ?, ?)";
+      $sql = "INSERT INTO records (full_name, username, faculty, department, admission_date, admission_type, comment, image_file)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
       // prepare an SQL statement for execution
       $stmt = mysqli_prepare($conn, $sql);
@@ -48,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
 
         // bind variables for the parameter makers in the SQL statement
-        mysqli_stmt_bind_param($stmt, 'sssssss', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment);
+        mysqli_stmt_bind_param($stmt, 'ssssssss', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment, $filename);
 
         //execute the prepared statement
         $results = mysqli_stmt_execute($stmt);
@@ -107,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
 
         <!--Full Name and Username -->
 
@@ -184,6 +186,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="mb-4">
             <label for="comments" class="form-label">Additional Comments</label>
             <textarea class="form-control" id="comments" name="comment" placeholder="Leave a comment here..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="file">Upload Image:</label>
+            <input type="file" name="file" id="file" accept="image/*">
+          </div>
+
           </div>
 
           <div class="d-flex justify-content-center gap-3">

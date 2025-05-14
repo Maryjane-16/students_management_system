@@ -5,6 +5,7 @@ session_start();
 require_once "includes/db_connect.php";
 require_once "includes/get_record_id.php";
 require_once "includes/isloggedin.php";
+require_once "includes/form_validate.php";
 
 $id = $_GET['id'];
 
@@ -32,6 +33,7 @@ if (isset($_GET['id']) || !empty($_GET['id'])) {
     $admission_date = $data['admission_date'];
     $admission_type = $data['admission_type'];
     $comment = $data['comment'];
+    $filename = $data['image_file'];
   }
 } else {
   // You can also handle the case where no id is in the URL
@@ -45,28 +47,32 @@ if (isset($_GET['id']) || !empty($_GET['id'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if (isset($_POST['update'])) {
-    $full_name = trim(htmlspecialchars($_POST['full_name']));
-    $username = trim(htmlspecialchars($_POST['username']));
-    $faculty = trim(htmlspecialchars($_POST['faculty']));
-    $department = trim(htmlspecialchars($_POST['department']));
-    $admission_date = trim(htmlspecialchars($_POST['admission_date']));
-    $admission_type = trim(htmlspecialchars($_POST['admission_type']));
-    $comment = trim(htmlspecialchars($_POST['comment']));
 
-    if (!empty($full_name) && !empty($username) && !empty($faculty) && !empty($department) && !empty($admission_date) && !empty($admission_type)) {
-      if ($comment == '') {
-        $comment = null;
-      }
+    require_once "includes/file_upload.php";
+
+    $full_name = trim(filter_input(INPUT_POST, 'full_name'));
+    $username = trim(filter_input(INPUT_POST, 'username'));
+    $faculty = trim(filter_input(INPUT_POST, 'faculty'));
+    $department = trim(filter_input(INPUT_POST, 'department'));
+    $admission_date = trim(filter_input(INPUT_POST, 'admission_date'));
+    $admission_type = trim(filter_input(INPUT_POST, 'admission_type'));
+    $comment = trim(filter_input(INPUT_POST, 'comment'));
+
+    //checking for empty fields, and throwing an error if left empty
+    $errors = formValidation($full_name, $username, $faculty, $department, $admission_date, $admission_type);
+
+    if (empty($errors)) {
+
 
       $sql = "UPDATE records
-              SET full_name = ?, username = ?, faculty = ?, department = ?, admission_date = ?, admission_type = ?, comment = ?
+              SET full_name = ?, username = ?, faculty = ?, department = ?, admission_date = ?, admission_type = ?, comment = ?, image_file = ?
               WHERE id = ?";
 
       // Prepare an SQL statement for execution
       $stmt = mysqli_prepare($conn, $sql);
 
       //bind variables for the parameter marker in the SQL statement prepared
-      mysqli_stmt_bind_param($stmt, 'sssssssi', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment, $id);
+      mysqli_stmt_bind_param($stmt, 'ssssssssi', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment, $filename, $id);
 
       //execute the prepared statement 
       $results = mysqli_stmt_execute($stmt);
@@ -101,7 +107,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h3 class="mb-0">Edit Student Record</h3>
       </div>
       <div class="card-body">
-        <form method="POST">
+
+        <!--show failure message-->
+        <?php if (!empty($errors)): ?>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul>
+              <?php foreach ($errors as $error): ?>
+                <li><?= $error ?></li>
+              <?php endforeach; ?>
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <?php endif; ?>
+
+        <form method="POST" enctype="multipart/form-data">
           <!-- full name and username -->
           <div class="row g-3 mb-3">
             <div class="col-md-6">
@@ -183,6 +202,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <textarea class="form-control" id="comments" rows="4" name="comment" placeholder="Leave a comment here..."><?= $comment ?></textarea>
           </div>
 
+          <div class="mb-3">
+            <label for="file">Upload Image:</label>
+            <input type="file" name="file" id="file" accept="image/*" onchange="checkImageResolution(event);" value="<?= $filename ?>">
+          </div>
+          <div id="error-message" style="color: red"></div>
+
           <div class="d-flex justify-content-center gap-2">
             <button type="submit" name="update" class="btn btn-primary px-5">Update</button>
             <a class="btn btn-secondary px-5" href="/index_records.php">Back</a>
@@ -193,6 +218,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
   </div>
 
+  <!-- checking image dimension to be uploaded-->
+  <script src="js/image-dimension.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

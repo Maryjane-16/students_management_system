@@ -60,11 +60,9 @@ if (isset($_POST['clear_records'])) {
                             <tr>
                                 <th>#</th>
                                 <th>Full Name</th>
-                                <th>Username</th>
-                                <th>Faculty</th>
-                                <th>Department</th>
                                 <th>Admission Date</th>
                                 <th>Admission Type</th>
+                                <th>Photos</th>
                                 <th>Comments</th>
                                 <th>Actions</th>
                             </tr>
@@ -75,19 +73,39 @@ if (isset($_POST['clear_records'])) {
                                 <!-- Example Data Row -->
                                 <?php foreach ($all_data as $index => $data): ?>
                                     <tr>
-                                        <td><?= $data['id'] ?></td>
-                                        <td><?= $data['full_name'] ?></td>
-                                        <td><?= $data['username'] ?></td>
-                                        <td><?= $data['faculty'] ?></td>
-                                        <td><?= $data['department'] ?></td>
-                                        <td><?= $data['admission_date'] ?></td>
-                                        <td><?= $data['admission_type'] ?></td>
+                                        <td><?= htmlspecialchars($data['id']) ?></td>
+                                        <td><?= htmlspecialchars($data['full_name']) ?></td>
+                                        <td><?= htmlspecialchars($data['admission_date']) ?></td>
+                                        <td><?= htmlspecialchars($data['admission_type']) ?></td>
                                         <td>
-                                            <?php if(!empty($data['comment'])): ?>
                                             <!-- Button trigger modal -->
                                             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal<?= $data['id'] ?>">
                                                 view
                                             </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="exampleModal<?= $data['id'] ?>" aria-labelledby="exampleModalLabel<?= $data['id'] ?>" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Student's Photo</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <img src="http://localhost/students_management_system/uploads/<?= $data['image_file'] ?>" alt="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($data['comment'])): ?>
+                                                <!-- Button trigger modal -->
+                                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal<?= $data['id'] ?>">
+                                                    view
+                                                </button>
                                             <?php else: ?>
                                                 <button type="button" class="btn btn-sm btn-primary" disabled>view</button>
                                             <?php endif; ?>
@@ -101,15 +119,15 @@ if (isset($_POST['clear_records'])) {
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <?= $data['comment'] ?>
+                                                            <?= htmlspecialchars($data['comment']) ?>
                                                         </div>
                                                     </div>
-                                                </div>q
+                                                </div>
                                             </div>
                                         </td>
                                         <td>
                                             <a class="btn btn-sm btn-secondary" href="show.php?id=<?= $data['id'] ?>">Show</a>
-                                            <a class="btn btn-sm btn-warning me-1" href="edit.php?id=<?=$data['id'] ?>">Update</a>
+                                            <a class="btn btn-sm btn-warning me-1" href="edit.php?id=<?= $data['id'] ?>">Edit</a>
                                             <a class="btn btn-sm btn-danger" href="delete.php?id=<?= $data['id'] ?>">Delete</a>
                                         </td>
                                     </tr>
@@ -127,7 +145,28 @@ if (isset($_POST['clear_records'])) {
                     <a href="/index.php" class="btn btn-success px-4">Add New Student</a>
 
                     <form method="POST">
-                        <button type="submit" name="clear_records" class="btn btn-dark px-4">Clear Records</button>
+                        
+
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-dark px-4" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Clear Records
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure?</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" name="clear_records" class="btn btn-sm btn-primary">YES, Delete!</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
 

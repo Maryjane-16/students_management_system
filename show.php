@@ -14,19 +14,16 @@ $id = $_GET['id'];
 
 //connect our db
 $conn = connectDB();
-
 $data = getRecordById($conn, $id);
+
+// Download to pdf
+if (isset($_POST['download'])){
+  header("Location: http://localhost/students_management_system/print_pdf.php?id={$data['id']}");
+  exit;
+}
 
 
 //print_r($data);
-
-
-
-
-
-
-
-
 
 ?>
 
@@ -59,18 +56,35 @@ $data = getRecordById($conn, $id);
 
         <!-- Student Info Section -->
         <div class="row mb-3">
-          <div class="col-md-6">
-            <p><strong>Full Name:</strong> <?= $data['full_name'] ?></p>
-            <p><strong>Username:</strong> <?= $data['username'] ?></p>
-            <p><strong>Faculty:</strong> <?= $data['faculty'] ?></p>
-            <p><strong>Department:</strong> <?= $data['department'] ?></p>
-          </div>
-          <div class="col-md-6">
-            <p><strong>Admission Date:</strong> <?= $data['admission_date'] ?></p>
-            <p><strong>Admission Type:</strong> <?= $data['admission_type'] ?></p>
-            <p><strong>Comments:</strong> <?= $data['comment'] ?></p>
-          </div>
+          <img src="http://localhost/students_management_system/uploads/<?= $data['image_file'] ?>" alt="">
+
         </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p><strong>Full Name:</strong> <?= htmlspecialchars($data['full_name']) ?></p>
+            <p><strong>Username:</strong> <?= htmlspecialchars($data['username']) ?></p>
+            <p><strong>Faculty:</strong> <?= htmlspecialchars($data['faculty']) ?></p>
+            <p><strong>Department:</strong> <?= htmlspecialchars($data['department']) ?></p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Admission Date:</strong> <?= htmlspecialchars($data['admission_date']) ?></p>
+            <p><strong>Admission Type:</strong> <?= htmlspecialchars($data['admission_type']) ?></p>
+            <p><strong>Comments:</strong> <?= htmlspecialchars($data['comment']) ?></p>
+            <P><strong>
+              <form method="POST">
+                <button type="submit" name="download">Download PDF</button>
+              </form>
+            </P>
+        <!-- </div>
+        </div class="col-mb-6">
+        <form method="POST">
+          <button type="submit" name="download">Download PDF</button>
+        </form>
+        <div>-->
+        </div>
+
+
 
         <!-- Action Buttons -->
         <div class="d-flex justify-content-between mt-4">

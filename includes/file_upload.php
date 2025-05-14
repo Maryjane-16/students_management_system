@@ -35,6 +35,12 @@ try {
         throw new Exception("Invalid file type uploaded.");
     }
 
+     // ** Add this block for dimension check **
+     list($width, $height) = getimagesize($_FILES['file']['tmp_name']);
+     if ($width > 350 && $height > 200) {
+         throw new Exception("Invalid image dimensions. Required: 350x200 pixels.");
+     }
+
    //prevent filename from code injections
    $pathinfo = pathinfo($_FILES['file']['name']);
    $base = $pathinfo['filename'];

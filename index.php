@@ -4,6 +4,7 @@ session_start();
 
 require_once "includes/db_connect.php";
 require_once "includes/auth.php";
+require_once "includes/form_validate.php";
 
 //initiate an error handler function
 function myErrorHandler($errno, $errstr)
@@ -21,15 +22,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     require_once "includes/file_upload.php";
 
-    $full_name = trim(htmlspecialchars($_POST['full_name']));
-    $username = trim(htmlspecialchars($_POST['username']));
-    $faculty = trim(htmlspecialchars($_POST['faculty']));
-    $department = trim(htmlspecialchars($_POST['department']));
-    $admission_date = trim(htmlspecialchars($_POST['admission_date']));
-    $admission_type = trim(htmlspecialchars($_POST['admission_type']));
-    $comment = trim(htmlspecialchars($_POST['comment']));
+    $full_name = trim(filter_input(INPUT_POST, 'full_name'));
+    $username = trim(filter_input(INPUT_POST, 'username'));
+    $faculty = trim(filter_input(INPUT_POST, 'faculty'));
+    $department = trim(filter_input(INPUT_POST, 'department'));
+    $admission_date = trim(filter_input(INPUT_POST, 'admission_date'));
+    $admission_type = trim(filter_input(INPUT_POST, 'admission_type'));
+    $comment = trim(filter_input(INPUT_POST, 'comment'));
 
-    if (!empty($full_name) && !empty($username) && !empty($faculty) && !empty($department) && !empty($admission_date) && !empty($admission_type)) {
+    //checking for empty fields, and throwing an error if left empty
+    $errors = formValidation($full_name, $username, $faculty, $department, $admission_date, $admission_type, $filename);
+    
+    if (empty($errors)) {
 
       if ($comment == '') {
         $comment = null;
@@ -50,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       } else {
 
         // bind variables for the parameter makers in the SQL statement
-        mysqli_stmt_bind_param($stmt, 'ssssssss', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment, $filename);
+        mysqli_stmt_bind_param($stmt, 'ssssssss', $full_name, $username, $faculty, $department, $admission_date, $admission_type, $comment);
 
         //execute the prepared statement
         $results = mysqli_stmt_execute($stmt);
@@ -62,10 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           exit;
         }
       }
-    } else {
-      header('Location: http://localhost:200/index.php?failure=1');
-      exit;
-    }
+    } 
   }
 }
 
@@ -102,10 +103,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
 
         <!--show failure message-->
-        <?php if (isset($_GET['failure']) && $_GET['failure'] == 1): ?>
+        <?php if (!empty($errors)): ?>
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            Form submission error!
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          <ul>
+            <?php foreach($errors as $error): ?>
+              <li><?= $error ?></li>
+              <?php endforeach; ?>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         <?php endif; ?>
 
@@ -190,8 +195,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <div class="mb-3">
             <label for="file">Upload Image:</label>
-            <input type="file" name="file" id="file" accept="image/*">
+            <input type="file" name="file" id="file" accept="image/*" onchange="checkImageResolution(event);">
           </div>
+          <div id="error-message" style="color: red"></div>
 
           </div>
 
@@ -219,8 +225,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
     </div>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- checking image dimension to be uploaded-->
+   <script src="js/image-dimension.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
